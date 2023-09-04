@@ -10,13 +10,23 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.example.restapiservice_test.model.*;
+import com.example.restapiservice_test.service.MyModifyService;
 
 @Slf4j
 @RestController
 public class MyController {
 
+    private final MyModifyService myModifyService;
+
+    @Autowired
+    public MyController(@Qualifier("ModifyErrorMessage") MyModifyService myModifyService) {
+        this.myModifyService = myModifyService;
+    }
+
     @PostMapping(value = "/feedback")
     public ResponseEntity<Response> feedback(@RequestBody Request request) {
+
+        log.info("Input request : " + String.valueOf(request));
         Response response = Response.builder()
                 .uid(request.getUid())
                 .operationUid(request.getOperationUid())
@@ -25,6 +35,9 @@ public class MyController {
                 .errorCode("")
                 .errorMessage("")
                 .build();
+
+        Response responseAfterModify = myModifyService.modify(response);
+        log.info("Output response : "+ String.valueOf(response));
 
         return new ResponseEntity<>(response, HttpStatus.OK);
 
